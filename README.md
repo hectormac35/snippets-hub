@@ -1,26 +1,42 @@
+# Snippets Hub
 
-# Snippets Hub Ultra PRO+ — Docker Compose
+Snippets Hub is a full-stack web application designed to organize, manage and share code snippets efficiently.  
+It supports authentication, workspaces, and a clean dashboard experience, all fully dockerized.
 
-## Estructura
-.
-├─ backend/   (API Express + Prisma/PostgreSQL)
-├─ frontend/  (React, SPA)
-└─ docker-compose.yml
+## 🚀 Tech Stack
 
-## Uso
-1) Copia `.env.example` a `.env` y ajusta valores si quieres.
-2) Construye y levanta todo:
-   ```bash
-   docker compose up --build
-   ```
-3) URLs:
-   - Web: http://localhost:3000
-   - API: http://localhost:5000
-   - Docs: http://localhost:5000/docs
-   - Salud: http://localhost:5000/health
-   - Métricas: http://localhost:5000/metrics
+**Frontend**
+- React
+- Context API
+- CSS
 
-## Notas
-- El frontend toma `REACT_APP_API_URL` en **build** (configurable en `.env`).
-- La API ejecuta `prisma migrate deploy` al arrancar.
-- Para reiniciar limpio la DB: `docker compose down -v` (borra el volumen `pgdata`).
+**Backend**
+- Node.js
+- Express
+- Prisma ORM
+- PostgreSQL
+- JWT Authentication
+
+**Infrastructure**
+- Docker
+- Docker Compose
+- Nginx
+
+---
+
+## ✨ Features
+
+- User authentication (register / login)
+- JWT access & refresh tokens
+- Workspace-based snippet organization
+- Create, edit, delete and restore snippets
+- Trash system
+- Public snippets support
+- Secure API with middleware
+- Full Dockerized environment
+
+---
+
+## 📦 Project Structure
+
+
