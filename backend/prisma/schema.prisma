@@ -1,0 +1,163 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl", "linux-musl-openssl-3.0.x"]
+}
+
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      String   @default("user")
+  theme     String   @default("dark")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones (lados opuestos)
+  memberships        Membership[]
+  snippets           Snippet[]
+  refreshTokens      RefreshToken[]
+  resetTokens        ResetToken[]         // <— añadido
+  apiTokens          ApiToken[]
+  createdWorkspaces  Workspace[] @relation("CreatedWorkspaces") // <— añadido
+}
+
+model Workspace {
+  id          String   @id @default(uuid())
+  name        String
+  // Relación con User (con nombre de relación y lado opuesto definido arriba)
+  createdBy   User     @relation("CreatedWorkspaces", fields: [createdById], references: [id])
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  memberships Membership[]
+  snippets    Snippet[]
+  webhooks    Webhook[]
+  auditLogs   AuditLog[]
+}
+
+model Membership {
+  id          String    @id @default(uuid())
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId String
+  role        Role      @default(EDITOR)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([userId, workspaceId])
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+model Snippet {
+  id          String   @id @default(uuid())
+  title       String?
+  language    String
+  description String?
+  code        String
+  tags        String[]
+  favorite    Boolean  @default(false)
+  visibility  String   @default("private") // public | private | unlisted
+  shareSlug   String?  @unique
+  deletedAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId String
+  versions    SnippetVersion[]
+  shareHits   ShareHit[]
+}
+
+model SnippetVersion {
+  id          String   @id @default(uuid())
+  snippet     Snippet  @relation(fields: [snippetId], references: [id])
+  snippetId   String
+  version     Int
+  title       String?
+  language    String
+  description String?
+  code        String
+  tags        String[]
+  createdAt   DateTime @default(now())
+  authorId    String?
+
+  @@unique([snippetId, version])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  tokenId   String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+  revoked   Boolean  @default(false)
+}
+
+model ResetToken {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id]) // <— tiene lado opuesto en User.resetTokens
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+}
+
+model ApiToken {
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  name       String
+  tokenHash  String
+  lastChars  String
+  createdAt  DateTime @default(now())
+  revoked    Boolean  @default(false)
+}
+
+model Webhook {
+  id          String    @id @default(uuid())
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId String
+  url         String
+  events      String[]
+  secret      String?
+  createdAt   DateTime  @default(now())
+  active      Boolean   @default(true)
+}
+
+model ShareHit {
+  id        String   @id @default(uuid())
+  snippet   Snippet  @relation(fields: [snippetId], references: [id])
+  snippetId String
+  createdAt DateTime @default(now())
+  ip        String?
+}
+
+model AuditLog {
+  id          String    @id @default(uuid())
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId String
+  userId      String?
+  action      String
+  targetType  String
+  targetId    String?
+  meta        Json?
+  createdAt   DateTime  @default(now())
+}
+
