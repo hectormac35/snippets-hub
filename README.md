@@ -35,8 +35,6 @@ It supports authentication, workspaces, and a clean dashboard experience, all fu
 - Secure API with middleware
 - Full Dockerized environment
 
----
-
 ## ⚙️ Environment Setup
 
 Create environment files from the examples:
