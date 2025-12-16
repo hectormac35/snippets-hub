@@ -5,6 +5,17 @@ import { useSettings } from "../settings/SettingsContext";
 export default function SettingsPage(){
   const { theme, setTheme, lang, setLang, codeSize, setCodeSize, previewExpanded, setPreviewExpanded, sortOrder, setSortOrder, cardStyle, setCardStyle, t } = useSettings();
 
+  console.log("SETTINGS CTX", {
+    theme, setTheme,
+    lang, setLang,
+    codeSize, setCodeSize,
+    previewExpanded, setPreviewExpanded,
+    sortOrder, setSortOrder,
+    cardStyle, setCardStyle,
+    t
+  });
+
+
   const [tempSize, setTempSize] = useState(codeSize);
   useEffect(()=>{ setTempSize(codeSize); }, [codeSize]);
 
