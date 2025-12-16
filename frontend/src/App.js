@@ -1,3 +1,4 @@
+// frontend/src/App.js
 import React from "react";
 import { Routes, Route, Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./auth/AuthContext";
@@ -16,11 +17,22 @@ function Navbar() {
   const { user } = useAuth();
   const { t } = useSettings();
 
+  // ✅ autenticación REAL
+  const isAuthenticated =
+    !!user && !!localStorage.getItem("accessToken");
+
+  // ✅ NO mostrar navbar en login / register
+  if (loc.pathname === "/login" || loc.pathname === "/register") {
+    return null;
+  }
+
   const exit = async () => {
     try {
       await logout();
     } catch {}
+
     localStorage.removeItem("user");
+    localStorage.removeItem("accessToken");
     nav("/login");
   };
 
@@ -32,7 +44,7 @@ function Navbar() {
 
       <div className="spacer" />
 
-      {user ? (
+      {isAuthenticated && (
         <>
           <Link
             to="/trash"
@@ -51,15 +63,6 @@ function Navbar() {
           <button className="btn" onClick={exit}>
             {t("logout")}
           </button>
-        </>
-      ) : (
-        <>
-          <Link to="/login" className="btn">
-            {t("login")}
-          </Link>
-          <Link to="/register" className="btn">
-            {t("register")}
-          </Link>
         </>
       )}
     </nav>
